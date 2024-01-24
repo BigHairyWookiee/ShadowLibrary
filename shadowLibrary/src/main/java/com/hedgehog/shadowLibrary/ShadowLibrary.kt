@@ -109,16 +109,26 @@ class ShadowLibrary @JvmOverloads constructor(
         return drawable.toBitmap(width, height)
     }
 
-    private fun drawShadow(width: Int, height: Int): Bitmap {
-        val drawable =
-            ResourcesCompat.getDrawable(resources, shadowBuilder.image ?: image, null)
-                ?: error("error")
-        Log.d("spectra", "$width, $height")
-        Log.d("spectra", "${shadowBuilder.shadowScale}, $shadowScale")
-        val widthBitmap = (width * (shadowBuilder.shadowScale ?: shadowScale)).toInt()
-        val heightBitmap = (height * (shadowBuilder.shadowScale ?: shadowScale)).toInt()
-        return setShadowParam(drawable.toBitmap(widthBitmap, heightBitmap))
-    }
+private fun drawShadow(width: Int, height: Int): Bitmap {
+    val drawable = ResourcesCompat.getDrawable(resources, shadowBuilder.image ?: image, null)
+        ?: error("error")
+
+    val shadowScale = shadowBuilder.shadowScale ?: shadowScale
+    val shadowPaddingTop = shadowBuilder.shadowPaddingTop ?: shadowPaddingTop
+    val shadowPaddingBottom = shadowBuilder.shadowPaddingBottom ?: shadowPaddingBottom
+    val shadowPaddingLeft = shadowBuilder.shadowPaddingLeft ?: shadowPaddingLeft
+    val shadowPaddingRight = shadowBuilder.shadowPaddingRight ?: shadowPaddingRight
+    val shadowRadius = shadowBuilder.shadowRadius ?: shadowRadius
+
+    val widthBitmap = (width * shadowScale).toInt() +
+            shadowPaddingLeft + shadowPaddingRight
+    val heightBitmap = (height * shadowScale).toInt() +
+            shadowPaddingTop + shadowPaddingBottom
+
+    val drawBitmap = drawable.toBitmap(widthBitmap, heightBitmap)
+
+    return setShadowParam(drawBitmap, shadowRadius)
+}
 
     private fun setShadowParam(bitmap: Bitmap): Bitmap {
         var drawBitmap = bitmap
